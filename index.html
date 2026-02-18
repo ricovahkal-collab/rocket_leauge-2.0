@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rocket League Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div class="ui">
+            <div class="score">
+                <div>Red: <span id="redScore">0</span></div>
+                <div>Blue: <span id="blueScore">0</span></div>
+            </div>
+            <div class="controls">
+                <p><strong>Red Team:</strong> WASD + Q boost</p>
+                <p><strong>Blue Team:</strong> Arrow Keys + Space boost</p>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
