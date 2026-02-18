@@ -258,6 +258,50 @@ class Ball {
     }
 }
 
+// Particle class for goal explosion
+class Particle {
+    constructor(x, y, vx, vy, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.color = color;
+        this.size = Math.random() * 6 + 3;
+        this.life = 1;
+        this.decay = Math.random() * 0.02 + 0.01;
+    }
+
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.3; // gravity
+        this.life -= this.decay;
+    }
+
+    draw() {
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+}
+
+// Particles array for explosions
+const particles = [];
+
+function createExplosion(x, y, color) {
+    const particleCount = 40;
+    for (let i = 0; i < particleCount; i++) {
+        const angle = (Math.PI * 2 * i) / particleCount;
+        const speed = Math.random() * 8 + 4;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+        particles.push(new Particle(x, y, vx, vy, color));
+    }
+}
+
 // Initialize game objects
 const redCar = new Car(200, 400, '#ff3333');
 const blueCar = new Car(1000, 400, '#3333ff');
@@ -350,12 +394,14 @@ function checkGoals() {
     if (ball.x + ball.radius > canvas.width && ball.y > goalYMin && ball.y < goalYMax) {
         game.redScore++;
         console.log('🔴 Red scores! Total: ' + game.redScore);
+        createExplosion(ball.x, ball.y, '#ff6666');
         resetPositions();
     }
     // Ball in left goal (blue scores)
     else if (ball.x - ball.radius < 0 && ball.y > goalYMin && ball.y < goalYMax) {
         game.blueScore++;
         console.log('🔵 Blue scores! Total: ' + game.blueScore);
+        createExplosion(ball.x, ball.y, '#6666ff');
         resetPositions();
     }
 }
@@ -408,6 +454,14 @@ function gameLoop() {
     blueCar.update();
     ball.update();
 
+    // Update particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        if (particles[i].life <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+
     // Collision detection
     ball.collideWith(redCar);
     ball.collideWith(blueCar);
@@ -421,6 +475,12 @@ function gameLoop() {
     redCar.draw();
     blueCar.draw();
     ball.draw();
+    
+    // Draw particles
+    for (let particle of particles) {
+        particle.draw();
+    }
+    
     drawScore();
 
     updateUI();
